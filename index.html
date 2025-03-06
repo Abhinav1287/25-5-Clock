@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>25 + 5 Clock</title>
+    <style>
+        body {
+            background-color: #1d4c4f;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 28px;
+        }
+        .length-controls {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .control {
+            text-align: center;
+        }
+        button {
+            font-size: 20px;
+            background-color: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .timer {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            display: inline-block;
+            font-size: 40px;
+        }
+        .controls button {
+            font-size: 30px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>25 + 5 Clock</h1>
+
+        <div class="length-controls">
+            <div class="control">
+                <h2 id="break-label">Break Length</h2>
+                <button id="break-decrement">⬇</button>
+                <span id="break-length">5</span>
+                <button id="break-increment">⬆</button>
+            </div>
+
+            <div class="control">
+                <h2 id="session-label">Session Length</h2>
+                <button id="session-decrement">⬇</button>
+                <span id="session-length">25</span>
+                <button id="session-increment">⬆</button>
+            </div>
+        </div>
+
+        <div class="timer">
+            <h2 id="timer-label">Session</h2>
+            <div id="time-left">25:00</div>
+        </div>
+
+        <div class="controls">
+            <button id="start_stop">⏯</button>
+            <button id="reset">🔄</button>
+        </div>
+    </div>
+
+    <script>
+        let breakLength = 5;
+        let sessionLength = 25;
+        let timeLeft = sessionLength * 60;
+        let isRunning = false;
+        let isBreak = false;
+        let timer;
+
+        const breakLengthDisplay = document.getElementById("break-length");
+        const sessionLengthDisplay = document.getElementById("session-length");
+        const timerLabel = document.getElementById("timer-label");
+        const timeLeftDisplay = document.getElementById("time-left");
+        const startStopButton = document.getElementById("start_stop");
+        const resetButton = document.getElementById("reset");
+
+        function updateDisplay() {
+            timeLeftDisplay.innerText = formatTime(timeLeft);
+            breakLengthDisplay.innerText = breakLength;
+            sessionLengthDisplay.innerText = sessionLength;
+        }
+
+        function formatTime(seconds) {
+            let minutes = Math.floor(seconds / 60);
+            let secs = seconds % 60;
+            return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+        }
+
+        document.getElementById("break-increment").addEventListener("click", () => {
+            if (breakLength < 60) {
+                breakLength++;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById("break-decrement").addEventListener("click", () => {
+            if (breakLength > 1) {
+                breakLength--;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById("session-increment").addEventListener("click", () => {
+            if (sessionLength < 60) {
+                sessionLength++;
+                timeLeft = sessionLength * 60;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById("session-decrement").addEventListener("click", () => {
+            if (sessionLength > 1) {
+                sessionLength--;
+                timeLeft = sessionLength * 60;
+                updateDisplay();
+            }
+        });
+
+        startStopButton.addEventListener("click", () => {
+            if (isRunning) {
+                clearInterval(timer);
+            } else {
+                timer = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+                    } else {
+                        isBreak = !isBreak;
+                        timerLabel.innerText = isBreak ? "Break" : "Session";
+                        timeLeft = (isBreak ? breakLength : sessionLength) * 60;
+                    }
+                }, 1000);
+            }
+            isRunning = !isRunning;
+        });
+
+        resetButton.addEventListener("click", () => {
+            clearInterval(timer);
+            isRunning = false;
+            isBreak = false;
+            breakLength = 5;
+            sessionLength = 25;
+            timeLeft = sessionLength * 60;
+            timerLabel.innerText = "Session";
+            updateDisplay();
+        });
+
+        updateDisplay();
+    </script>
+    <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+</body>
+</html>
